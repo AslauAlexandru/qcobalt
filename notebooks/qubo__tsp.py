@@ -8,13 +8,17 @@ app = marimo.App(app_title="QUBO TSP – QCobalt", html_head_file="")
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""# <span style="font-variant-caps: small-caps">qubo</span> Travelling Salesman Problem""")
+    mo.md(
+        r"""# <span style="font-variant-caps: small-caps">qubo</span> Travelling Salesman Problem"""
+    )
     return
 
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(r"""This notebook translates the travelling salesman problem (<span style="font-variant-caps: small-caps">tsp</span>) into a quadratic non-linear objective that fits the quadratic unconstrained binary optimisation (<span style="font-variant-caps: small-caps">qubo</span>) framework. We revisit the penalty method, define binary decision variables that encode tours, and assemble the full <span style="font-variant-caps: small-caps">qubo</span> including its matrix representation.""")
+    mo.md(
+        r"""This notebook translates the travelling salesman problem (<span style="font-variant-caps: small-caps">tsp</span>) into a quadratic non-linear objective that fits the quadratic unconstrained binary optimisation (<span style="font-variant-caps: small-caps">qubo</span>) framework. We revisit the penalty method, define binary decision variables that encode tours, and assemble the full <span style="font-variant-caps: small-caps">qubo</span> including its matrix representation."""
+    )
     return
 
 
@@ -334,8 +338,6 @@ def _(mo):
 @app.cell(hide_code=True)
 def _():
     from foundation import optimise
-
-    print(optimise([[1,2],[3,5]]))
     return (optimise,)
 
 
