@@ -1,0 +1,7 @@
+__pycache__/
+.DS_Store
+.venv/
+.virtualenv/
+conversion_plan.md
+legacy/
+pyproject.toml
