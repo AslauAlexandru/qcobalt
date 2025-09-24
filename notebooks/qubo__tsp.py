@@ -235,12 +235,12 @@ def _(mo):
 def _(np):
     city_labels = ["0", "1", "2"]
     sample_costs = np.array(
-    	[
-    		[0, 10, 7],
-    		[15, 0, 9],
-    		[14, 8, 0],
-    	],
-    	dtype=float,
+        [
+            [0, 10, 7],
+            [15, 0, 9],
+            [14, 8, 0],
+        ],
+        dtype=float,
     )
     return city_labels, sample_costs
 
@@ -248,7 +248,7 @@ def _(np):
 @app.cell(hide_code=True)
 def _(mo):
     penalty = mo.ui.slider(
-    	start=5, stop=60, step=1, value=30, label="Penalty coefficient $P$"
+        start=5, stop=60, step=1, value=30, label="Penalty coefficient $P$"
     )
     return (penalty,)
 
@@ -269,28 +269,28 @@ def _(
     _qubo, _offset = build_tsp_qubo(sample_costs, penalty.value)
     _value, _assignment = optimise(_qubo.tolist())
     _grid = np.array(_assignment, dtype=int).reshape(
-    	len(city_labels), len(city_labels)
+        len(city_labels), len(city_labels)
     )
     _schedule = decode_tour(_assignment, len(city_labels))
     route_labels = None
     _total_cost = None
     if None not in _schedule:
-    	route_labels = [city_labels[_city] for _city in _schedule]
-    	_total_cost = tour_cost(_schedule, sample_costs)
+        route_labels = [city_labels[_city] for _city in _schedule]
+        _total_cost = tour_cost(_schedule, sample_costs)
     _report = [
-    	mo.md(assignment_as_markdown(_grid, city_labels)),
+        mo.md(assignment_as_markdown(_grid, city_labels)),
     ]
     if route_labels is None:
-    	_report.append(
-    		mo.md(
-    			r"""The assignment violates the constraints. Increase $P$ to penalise invalid tours."""
-    		)
-    	)
+        _report.append(
+            mo.md(
+                r"""The assignment violates the constraints. Increase $P$ to penalise invalid tours."""
+            )
+        )
     else:
-    	_sequence = " \\rightarrow ".join([*route_labels, route_labels[0]])
-    	_report.append(
-    		mo.md(rf"""Tour: ${_sequence}$ with total cost ${_total_cost}$.""")
-    	)
+        _sequence = " \\rightarrow ".join([*route_labels, route_labels[0]])
+        _report.append(
+            mo.md(rf"""Tour: ${_sequence}$ with total cost ${_total_cost}$.""")
+        )
     mo.vstack(_report)
     return
 
@@ -334,6 +334,8 @@ def _(mo):
 @app.cell(hide_code=True)
 def _():
     from foundation import optimise
+
+    print(optimise([[1,2],[3,5]]))
     return (optimise,)
 
 
@@ -342,84 +344,88 @@ def _():
     import numpy as np
     from numpy.typing import NDArray
 
+
     def build_tsp_qubo(costs: NDArray, penalty: float):
-    	costs = np.asarray(costs, dtype=float)
-    	if costs.ndim != 2 or costs.shape[0] != costs.shape[1]:
-    		raise ValueError("Cost matrix must be square.")
-    	n = costs.shape[0]
-    	size = n * n
-    	Q = np.zeros((size, size), dtype=float)
-    	penalty = float(penalty)
+        costs = np.asarray(costs, dtype=float)
+        if costs.ndim != 2 or costs.shape[0] != costs.shape[1]:
+            raise ValueError("Cost matrix must be square.")
+        n = costs.shape[0]
+        size = n * n
+        Q = np.zeros((size, size), dtype=float)
+        penalty = float(penalty)
 
-    	def add(index_i: int, index_j: int, value: float) -> None:
-    		if index_i <= index_j:
-    			Q[index_i, index_j] += value
-    		else:
-    			Q[index_j, index_i] += value
+        def add(index_i: int, index_j: int, value: float) -> None:
+            if index_i <= index_j:
+                Q[index_i, index_j] += value
+            else:
+                Q[index_j, index_i] += value
 
-    	for city in range(n):
-    		for time in range(n):
-    			idx = city * n + time
-    			add(idx, idx, -2.0 * penalty)
-    	for time in range(n):
-    		for city_a in range(n):
-    			for city_b in range(city_a + 1, n):
-    				idx_a = city_a * n + time
-    				idx_b = city_b * n + time
-    				add(idx_a, idx_b, 2.0 * penalty)
-    	for city in range(n):
-    		for time_a in range(n):
-    			for time_b in range(time_a + 1, n):
-    				idx_a = city * n + time_a
-    				idx_b = city * n + time_b
-    				add(idx_a, idx_b, 2.0 * penalty)
-    	for i in range(n):
-    		for j in range(n):
-    			if i == j:
-    				continue
-    			for time in range(n):
-    				idx_from = i * n + time
-    				idx_to = j * n + ((time + 1) % n)
-    				add(idx_from, idx_to, float(costs[i, j]))
-    	offset = 2.0 * penalty * n
-    	return Q, offset
+        for city in range(n):
+            for time in range(n):
+                idx = city * n + time
+                add(idx, idx, -2.0 * penalty)
+        for time in range(n):
+            for city_a in range(n):
+                for city_b in range(city_a + 1, n):
+                    idx_a = city_a * n + time
+                    idx_b = city_b * n + time
+                    add(idx_a, idx_b, 2.0 * penalty)
+        for city in range(n):
+            for time_a in range(n):
+                for time_b in range(time_a + 1, n):
+                    idx_a = city * n + time_a
+                    idx_b = city * n + time_b
+                    add(idx_a, idx_b, 2.0 * penalty)
+        for i in range(n):
+            for j in range(n):
+                if i == j:
+                    continue
+                for time in range(n):
+                    idx_from = i * n + time
+                    idx_to = j * n + ((time + 1) % n)
+                    add(idx_from, idx_to, float(costs[i, j]))
+        offset = 2.0 * penalty * n
+        return Q, offset
+
 
     def decode_tour(assignment: list[int] | np.ndarray, n: int):
-    	vector = np.asarray(assignment, dtype=int)
-    	if vector.size != n * n:
-    		raise ValueError("Assignment size must equal n squared.")
-    	grid = vector.reshape(n, n)
-    	order: list[int | None] = []
-    	for time in range(n):
-    		column = grid[:, time]
-    		selected = np.flatnonzero(column == 1)
-    		if selected.size == 1:
-    			order.append(int(selected[0]))
-    		else:
-    			order.append(None)
-    	return order
+        vector = np.asarray(assignment, dtype=int)
+        if vector.size != n * n:
+            raise ValueError("Assignment size must equal n squared.")
+        grid = vector.reshape(n, n)
+        order: list[int | None] = []
+        for time in range(n):
+            column = grid[:, time]
+            selected = np.flatnonzero(column == 1)
+            if selected.size == 1:
+                order.append(int(selected[0]))
+            else:
+                order.append(None)
+        return order
+
 
     def tour_cost(order: list[int | None], costs: np.ndarray):
-    	if any(city is None for city in order):
-    		return None
-    	costs = np.asarray(costs, dtype=float)
-    	total = 0.0
-    	n = len(order)
-    	for time in range(n):
-    		current = order[time]
-    		nxt = order[(time + 1) % n]
-    		total += float(costs[current, nxt])
-    	return total
+        if any(city is None for city in order):
+            return None
+        costs = np.asarray(costs, dtype=float)
+        total = 0.0
+        n = len(order)
+        for time in range(n):
+            current = order[time]
+            nxt = order[(time + 1) % n]
+            total += float(costs[current, nxt])
+        return total
+
 
     def assignment_as_markdown(grid: np.ndarray, labels: list[str]):
-    	n = grid.shape[0]
-    	header = "| Time | " + " | ".join(labels) + " |"
-    	separator = "| :--: | " + " | ".join([":--:"] * n) + " |"
-    	rows = []
-    	for time in range(n):
-    		cells = " | ".join(str(int(grid[city, time])) for city in range(n))
-    		rows.append(f"| {time} | {cells} |")
-    	return "\n".join([header, separator, *rows])
+        n = grid.shape[0]
+        header = "| Time | " + " | ".join(labels) + " |"
+        separator = "| :--: | " + " | ".join([":--:"] * n) + " |"
+        rows = []
+        for time in range(n):
+            cells = " | ".join(str(int(grid[city, time])) for city in range(n))
+            rows.append(f"| {time} | {cells} |")
+        return "\n".join([header, separator, *rows])
     return assignment_as_markdown, build_tsp_qubo, decode_tour, np, tour_cost
 
 
