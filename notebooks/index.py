@@ -50,6 +50,7 @@ def _(mo):
         1. [Travelling Salesman Problem](?file=notebooks/annealing__tsp.py)
         1. [Graph Colouring](?file=notebooks/annealing__graph_colouring.py)
         1. [Quantum Annealing](?file=notebooks/annealing__quantum.py)
+    1. [References](?file=notebooks/references.py)
     """
     )
     return
