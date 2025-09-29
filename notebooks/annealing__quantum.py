@@ -10,7 +10,7 @@ def _(mo):
         r"""
     # Quantum Annealing
 
-    Quantum annealing is a physical optimisation process that evolves a
+    Quantum annealing (<span style="font-variant: small-caps;">qa</span>) is a physical optimisation process that evolves a
     quantum system towards the ground state of a problem Hamiltonian. In the
     context of combinatorial optimisation, we encode our objective as an
     Ising model or a quadratic unconstrained binary optimisation
@@ -20,9 +20,97 @@ def _(mo):
     In this notebook, we will:
 
     - prepare a small Max-Cut instance as a <span style="font-variant: small-caps;">bqm</span>,
-    - attempt to solve it on a quantum processing unit (QPU) if configured,
+    - attempt to solve it on a quantum processing unit (<span style="font-variant: small-caps;">qpu</span>) if configured,
     - otherwise, fall back to a classical simulated annealer, and
     - visualise the best sample returned by the sampler.
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        r"""
+    ## Background and Adiabatic Picture
+
+    Quantum annealing (<span style="font-variant: small-caps;">qa</span>) is a heuristic method motivated by the
+    adiabatic model of quantum computation. The key idea is to prepare a
+    quantum system in an easy-to-prepare ground state and then evolve it
+    slowly so that it remains in the instantaneous ground state of a
+    time-dependent Hamiltonian.
+
+    > Quantum Adiabatic Theorem (informal): A quantum system that starts in
+    > the ground state of a time-dependent Hamiltonian remains in the ground
+    > state provided the Hamiltonian changes sufficiently slowly.
+
+    A common interpolation is
+
+    $$
+    H(t) = \Bigl(1 - \tfrac{t}{\tau}\Bigr)\, H_0 \; + \; \tfrac{t}{\tau}\, H_p,
+    $$
+
+    where $H_0$ is an initial Hamiltonian with a ground state that is simple
+    to prepare and $H_p$ is the problem Hamiltonian whose ground state encodes
+    the solution. At $t=0$ only $H_0$ acts; at $t=\tau$ only $H_p$ acts.
+    If the evolution is slow enough, the system finishes in the ground state
+    of $H_p$.
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        r"""
+    ## <span style="font-variant: small-caps;">qa</span> versus <span style="font-variant: small-caps;">aqc</span>
+
+    - In practice, quantum annealing relaxes some assumptions of adiabatic
+      quantum computing: devices are open systems and the schedule is not
+      necessarily adiabatic. <span style="font-variant: small-caps;">qa</span> is therefore heuristic.
+    - The problem Hamiltonian has a restricted, Ising-like form corresponding
+      to a classical objective function.
+    - Adiabatic quantum computing is universal (gate-model equivalent),
+      whereas <span style="font-variant: small-caps;">qa</span> is not designed for universal quantum computation.
+
+    Current commercial QA hardware is offered by D-Wave Systems.
+    """
+    )
+    return
+
+
+@app.cell(hide_code=True)
+def _(mo):
+    mo.md(
+        r"""
+    ## Initial and Problem Hamiltonians
+
+    A typical choice for the initial Hamiltonian is a transverse field,
+
+    $$
+    H_0 = - \sum_{i=1}^n \sigma_i^x,
+    $$
+
+    whose ground state is $|+\rangle^{\otimes n}$, easy to prepare.
+
+    On D-Wave hardware, the problem Hamiltonian has the Ising form
+
+    $$
+    H_p = \sum_{i} h_i\, \sigma_i^z \; + \; \sum_{(i,j)} J_{ij}\, \sigma_i^z\,\sigma_j^z,
+    $$
+
+    where $\sigma^z$ has eigenstates $|0\rangle$ and $|1\rangle$ with
+    eigenvalues $+1$ and $-1$, respectively. If we denote spins by
+    $s_i\in\{-1,1\}$, the energy of a computational basis state becomes
+
+    $$
+    E(\mathbf{s}) = \sum_i h_i s_i + \sum_{(i,j)} J_{ij} s_i s_j,
+    $$
+
+    which is exactly the Ising model energy. Consequently, if we formulate a
+    problem as an Ising model (or equivalently a <span style=\"font-variant: small-caps;\">qubo</span>),
+    we can target it with quantum annealing.
     """
     )
     return
@@ -74,7 +162,7 @@ def _(mo):
         r"""
     ## Choosing a sampler
 
-    We try to construct a QPU-backed sampler via
+    We try to construct a <span style="font-variant: small-caps;">qpu</span>-backed sampler via
     `EmbeddingComposite(DWaveSampler())`. If this is not available (for
     example, no API configuration), we fall back to a classical simulated
     annealer. This allows you to run the notebook locally without a QPU.
@@ -103,9 +191,9 @@ def _():
 @app.cell(hide_code=True)
 def _(is_qpu, mo):
     _msg = (
-        "Using QPU-backed sampler (EmbeddingComposite + DWaveSampler)."
+        "Using <span style=\"font-variant: small-caps;\">qpu</span>-backed sampler (EmbeddingComposite + DWaveSampler)."
         if is_qpu
-        else "QPU not available; using SimulatedAnnealingSampler."
+        else "<span style=\"font-variant: small-caps;\">qpu</span> not available; using SimulatedAnnealingSampler."
     )
     mo.md(
         rf"""
@@ -123,7 +211,7 @@ def _(mo):
 
     Typical knobs when using quantum annealing include number of reads, chain
     strength (when minor-embedding is required), and annealing time. We keep
-    parameters conservative here so the example runs both on QPU and locally.
+    parameters conservative here so the example runs both on <span style="font-variant: small-caps;">qpu</span> and locally.
     """
     )
     return
@@ -179,7 +267,7 @@ def _(mo):
         r"""
     ## **Task 1**
 
-    Change `num_reads`, `annealing_time`, and (if on a QPU) `chain_strength`.
+    Change `num_reads`, `annealing_time`, and (if on a <span style="font-variant: small-caps;">qpu</span>) `chain_strength`.
     Rerun the sampler cell and observe how frequently the best solution is
     found. Record your observations.
 
