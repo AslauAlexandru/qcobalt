@@ -170,6 +170,29 @@ def _(mo):
     return
 
 
+@app.cell
+def _(ExactSolver, bqm_example):
+    def _():
+        from dimod import BQM
+
+        _linear = {"x1": 5, "x2": -3}
+        _quadratic = {
+            ("x1", "x2"): 7,
+        }
+        _vartype = "BINARY"
+
+        bqm_qubo = BQM(_linear, _quadratic, _vartype)
+        print(bqm_qubo)
+
+        _sampler = ExactSolver()
+        sampleset_example = _sampler.sample(bqm_example)
+        return print(sampleset_example)
+
+
+    _()
+    return
+
+
 @app.cell(hide_code=True)
 def _(mo):
     mo.md(
@@ -181,6 +204,32 @@ def _(mo):
     $$s_1 + s_2 + s_3 + s_4 - 6s_1 s_3 - 6s_1 s_4 - 6s_3 s_4 - 6s_1 s_2$$
     """
     )
+    return
+
+
+@app.cell
+def _(ExactSolver, bqm_example):
+    def _():
+        from dimod import BQM
+
+        _linear = {"x1": 1, "x2": 1,'x3': 1, 'x4': 1}
+        _quadratic = {
+            ("x1", "x3"): -6,
+            ("x1", "x4"): -6,
+            ("x3", "x4"): -6,
+            ("x1", "x2"): -6,
+        }
+        _vartype = "BINARY"
+
+        bqm_qubo = BQM(_linear, _quadratic, _vartype)
+        print(bqm_qubo)
+
+        _sampler = ExactSolver()
+        sampleset_example = _sampler.sample(bqm_example)
+        return print(sampleset_example)
+
+
+    _()
     return
 
 
@@ -236,9 +285,7 @@ def _(BQM):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""Now that we have created a <span style="font-variant: small-caps;">qubo</span> instance, we can then assign `ExactSolver` to a variable for convenience. Then we should pass the instance `bqm_example` as an argument to the `sample` method of `ExactSolver` and assign it to another variable. This variable would then contain all the possible samples in the ascending order of their energy values."""
-    )
+    mo.md(r"""Now that we have created a <span style="font-variant: small-caps;">qubo</span> instance, we can then assign `ExactSolver` to a variable for convenience. Then we should pass the instance `bqm_example` as an argument to the `sample` method of `ExactSolver` and assign it to another variable. This variable would then contain all the possible samples in the ascending order of their energy values.""")
     return
 
 
@@ -431,9 +478,7 @@ def _(BQM, ExactSolver, mo):
 
 @app.cell(hide_code=True)
 def _(mo):
-    mo.md(
-        r"""Therefore the sample `{'s1': -1, 's2': 1, 's3': -1, 's4': 1}` minimises the objective function to an energy value of `-40`."""
-    )
+    mo.md(r"""Therefore the sample `{'s1': -1, 's2': 1, 's3': -1, 's4': 1}` minimises the objective function to an energy value of `-40`.""")
     return
 
 
@@ -469,6 +514,16 @@ def _(mo):
 def _():
     import marimo as mo
     return (mo,)
+
+
+@app.cell
+def _():
+    return
+
+
+@app.cell
+def _():
+    return
 
 
 if __name__ == "__main__":
